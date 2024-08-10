@@ -11,7 +11,7 @@ spring:
       host: localhost
       port: 6379
       username: default
-      password: systempass
+      password: password
 
 management:
   zipkin:

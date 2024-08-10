@@ -3,7 +3,7 @@ spring:
   datasource:
     url: jdbc:mysql://{endpoint}:3306/msa_exam
     username: root
-    password: mysqldo227890
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
