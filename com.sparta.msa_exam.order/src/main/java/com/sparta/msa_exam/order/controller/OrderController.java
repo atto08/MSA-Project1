@@ -30,10 +30,10 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    public ResponseEntity<OrderResponseDto> addProduct(@PathVariable Long orderId,
+    public ResponseEntity<OrderProductResponseDto> addProduct(@PathVariable Long orderId,
                                                        @RequestBody OrderRequestDto orderRequestDto) {
 
-        OrderResponseDto orderResponseDto = orderService.addProduct(orderId, orderRequestDto);
+        OrderProductResponseDto orderResponseDto = orderService.addProduct(orderId, orderRequestDto);
         HttpHeaders headers = addPortNumber();
         return new ResponseEntity<>(orderResponseDto, headers, HttpStatus.OK);
     }

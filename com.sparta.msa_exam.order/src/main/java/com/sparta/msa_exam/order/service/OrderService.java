@@ -10,6 +10,8 @@ import com.sparta.msa_exam.order.products.ProductResponseDto;
 import com.sparta.msa_exam.order.repository.OrderProductRepository;
 import com.sparta.msa_exam.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +47,9 @@ public class OrderService {
 
 
     @Transactional
-    public OrderResponseDto addProduct(Long orderId, OrderRequestDto orderRequestDto) {
+    @CachePut(cacheNames = "orderProductIdList", key = "args[0]")
+    @CacheEvict(cacheNames = "orderList", allEntries = true)
+    public OrderProductResponseDto addProduct(Long orderId, OrderRequestDto orderRequestDto) {
 
         Order order = findOrder(orderId);
 
@@ -62,16 +66,11 @@ public class OrderService {
             orderProductRepository.save(new OrderProduct(order, productId));
         }
 
-        List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId);
-        order.updateOrder(orderProductList);
-
-        Order updateOrder = orderRepository.save(order);
-
-        return new OrderResponseDto(updateOrder);
+        return getOrderList(orderId);
     }
 
 
-    @Cacheable(cacheNames = "orderList", key = "args[0]")
+    @Cacheable(cacheNames = "orderProductIdList", key = "args[0]")
     public OrderProductResponseDto getOrderList(Long orderId) {
         Order order = findOrder(orderId);
 

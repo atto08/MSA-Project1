@@ -27,8 +27,4 @@ public class Order {
     public Order(String name) {
         this.name = name;
     }
-
-    public void updateOrder(List<OrderProduct> orderProductList) {
-        this.orderItemIds = orderProductList;
-    }
 }
