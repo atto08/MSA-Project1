@@ -1,10 +1,6 @@
 package com.sparta.msa_exam.product;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,34 +13,24 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    @Value("${server.port}")
-    private String port;
 
-    public ResponseEntity<Product> createProduct(ProductRequestDto requestDto) {
+    public Product createProduct(ProductRequestDto requestDto) {
 
         Product product = new Product(requestDto);
         productRepository.save(product);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("port", port);
-
-        return new ResponseEntity<>(product, headers, HttpStatus.OK);
+        return product;
     }
 
     @Transactional
-    public ResponseEntity<List<ProductResponseDto>> getProductList() {
+    public List<ProductResponseDto> getProductList() {
 
-        System.out.println("Now port : " + port);
         List<Product> productList = productRepository.findAll();
         List<ProductResponseDto> productResponseDtoList = new ArrayList<>();
         for (Product product : productList) {
             productResponseDtoList.add(new ProductResponseDto(product));
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("port", port);
-
-        return new ResponseEntity<>(productResponseDtoList, headers, HttpStatus.OK);
+        return productResponseDtoList;
     }
 
     public ProductResponseDto getProductIdList(Long productId) {

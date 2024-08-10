@@ -1,6 +1,9 @@
 package com.sparta.msa_exam.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,21 +16,37 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<Product> createProduct(ProductRequestDto requestDto){
+    @Value("${server.port}")
+    private String port;
 
-        return productService.createProduct(requestDto);
+
+    @PostMapping
+    public ResponseEntity<Product> createProduct(ProductRequestDto requestDto) {
+
+        Product product = productService.createProduct(requestDto);
+        HttpHeaders headers = addPortNumber();
+        return new ResponseEntity<>(product, headers, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getProductList(){
+    public ResponseEntity<List<ProductResponseDto>> getProductList() {
 
-        return productService.getProductList();
+        List<ProductResponseDto> productResponseDtoList = productService.getProductList();
+        HttpHeaders headers = addPortNumber();
+        return new ResponseEntity<>(productResponseDtoList, headers, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ProductResponseDto getProductIdList(@PathVariable Long id){
+    public ResponseEntity<ProductResponseDto> getProductIdList(@PathVariable Long id) {
 
-        return productService.getProductIdList(id);
+        ProductResponseDto productResponseDto = productService.getProductIdList(id);
+        HttpHeaders headers = addPortNumber();
+        return new ResponseEntity<>(productResponseDto, headers, HttpStatus.OK);
+    }
+
+    private HttpHeaders addPortNumber() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("port", port);
+        return headers;
     }
 }
