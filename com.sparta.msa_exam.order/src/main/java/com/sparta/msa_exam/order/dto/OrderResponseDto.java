@@ -2,15 +2,18 @@ package com.sparta.msa_exam.order.dto;
 
 import com.sparta.msa_exam.order.entity.Order;
 import com.sparta.msa_exam.order.entity.OrderProduct;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
-public class OrderResponseDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderResponseDto implements Serializable {
     private Long id;
     private String name;
     private List<Long> productIdList;
@@ -19,7 +22,7 @@ public class OrderResponseDto {
         this.id = updateOrder.getId();
         this.name = updateOrder.getName();
         this.productIdList = new ArrayList<>();
-        for (OrderProduct productId : updateOrder.getOrderItemIds()){
+        for (OrderProduct productId : updateOrder.getOrderItemIds()) {
             productIdList.add(productId.getProductId());
         }
     }

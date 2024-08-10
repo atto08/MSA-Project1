@@ -10,10 +10,7 @@ import com.sparta.msa_exam.order.products.ProductResponseDto;
 import com.sparta.msa_exam.order.repository.OrderProductRepository;
 import com.sparta.msa_exam.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,73 +27,60 @@ public class OrderService {
 
     private final ProductClient productClient;
 
-    @Value("${server.port}")
-    private String port;
 
-
-    public ResponseEntity<OrderResponseDto> createOrder(OrderRequestDto orderRequestDto) {
+    public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
 
         Order order = new Order(orderRequestDto.getName());
         orderRepository.save(order);
 
         List<Long> orderProductIdList = new ArrayList<>();
-        for (Long productId : orderRequestDto.getProductIdList()){
+        for (Long productId : orderRequestDto.getProductIdList()) {
             OrderProduct orderProduct = new OrderProduct(order, productId);
             orderProductRepository.save(orderProduct);
             orderProductIdList.add(orderProduct.getProductId());
         }
-        OrderResponseDto orderResponseDto = new OrderResponseDto(order, orderProductIdList);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("port", port);
-
-        return new ResponseEntity<>(orderResponseDto, headers, HttpStatus.OK);
+        return new OrderResponseDto(order, orderProductIdList);
     }
 
+
     @Transactional
-    public ResponseEntity<OrderResponseDto> addProduct(Long orderId, OrderRequestDto orderRequestDto) {
+    public OrderResponseDto addProduct(Long orderId, OrderRequestDto orderRequestDto) {
 
         Order order = findOrder(orderId);
 
         List<ProductResponseDto> productList = productClient.getProductList().getBody();
         List<Long> productIdList = new ArrayList<>();
 
-        for (ProductResponseDto product : productList){
+        for (ProductResponseDto product : productList) {
             productIdList.add(product.getId());
         }
-
-        for(Long productId : orderRequestDto.getProductIdList()){
-            if(!productIdList.contains(productId)) continue;
-
+        // 주문받은 상품의 ID가 존재 할때만 추가
+        for (Long productId : orderRequestDto.getProductIdList()) {
+            if (!productIdList.contains(productId)) continue;
+            // 주문에 추가된 상품 저장
             orderProductRepository.save(new OrderProduct(order, productId));
         }
+
         List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId);
         order.updateOrder(orderProductList);
 
         Order updateOrder = orderRepository.save(order);
-        OrderResponseDto orderResponseDto = new OrderResponseDto(updateOrder);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("port", port);
-
-        return new ResponseEntity<>(orderResponseDto, headers, HttpStatus.OK);
+        return new OrderResponseDto(updateOrder);
     }
 
-    @Transactional
-    public ResponseEntity<OrderProductResponseDto> getOrderList(Long orderId) {
+
+    @Cacheable(cacheNames = "orderList", key = "args[0]")
+    public OrderProductResponseDto getOrderList(Long orderId) {
         Order order = findOrder(orderId);
 
-        List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId); // 해당 주문에 관련된 모든 상품 Id List
-        // product-service 에서 해당 상품 정보 리스트 전환
+        List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId);
         List<ProductResponseDto> productList = orderProductList.stream()
-                .map(orderProduct -> productClient.getProduct(orderProduct.getProductId())).toList();
+                .map(orderProduct -> productClient.getProduct(orderProduct.getProductId()))
+                .toList();
 
-        OrderProductResponseDto orderProductResponseDto = new OrderProductResponseDto(order, productList);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("port", port);
-
-        return new ResponseEntity<>(orderProductResponseDto, headers, HttpStatus.OK);
+        return new OrderProductResponseDto(order, productList);
     }
 
 

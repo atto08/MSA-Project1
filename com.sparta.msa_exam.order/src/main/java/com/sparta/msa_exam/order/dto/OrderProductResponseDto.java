@@ -4,12 +4,15 @@ import com.sparta.msa_exam.order.entity.Order;
 import com.sparta.msa_exam.order.products.ProductResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class OrderProductResponseDto {
+public class OrderProductResponseDto implements Serializable {
     private Long orderId;
     private String name;
     private List<ProductResponseDto> productList;
