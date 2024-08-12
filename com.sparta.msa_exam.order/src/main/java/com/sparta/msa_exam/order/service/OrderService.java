@@ -65,7 +65,7 @@ public class OrderService {
 
 
     // 주문 단건 조회 API 캐싱 처리
-    @Cacheable(cacheNames = "orderProductIdList", key = "args[0]")
+    @Cacheable(cacheNames = "order-cache", key = "args[0]")
     public OrderProductResponseDto getOrderList(Long orderId) {
         Order order = findOrder(orderId);
 
