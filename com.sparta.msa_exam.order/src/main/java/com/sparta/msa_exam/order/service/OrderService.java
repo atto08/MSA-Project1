@@ -11,11 +11,15 @@ import com.sparta.msa_exam.order.repository.OrderProductRepository;
 import com.sparta.msa_exam.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +29,7 @@ public class OrderService {
 
     private final OrderProductRepository orderProductRepository;
 
-    private final ProductClient productClient;
+    private final ProductService productService;
 
 
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
@@ -46,10 +50,12 @@ public class OrderService {
     @Transactional
     public OrderProductResponseDto addProduct(Long orderId, OrderRequestDto orderRequestDto) {
         Order order = findOrder(orderId);
+        // (Optional 적용 == NPE 방지) - 피드백 적용
+        List<ProductResponseDto> productList = Optional.ofNullable(productService.getProductList())
+                .map(ResponseEntity::getBody)
+                .orElse(Collections.emptyList());
 
-        List<ProductResponseDto> productList = productClient.getProductList().getBody();
         List<Long> productIdList = new ArrayList<>();
-
         for (ProductResponseDto product : productList) {
             productIdList.add(product.getId());
         }
@@ -60,7 +66,10 @@ public class OrderService {
             orderProductRepository.save(new OrderProduct(order, productId));
         }
 
-        return getOrderList(orderId);
+        // 서비스 별 클래스 분리 - 피드백 1-2 적용
+        List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId);
+        List<ProductResponseDto> productResponseDtoList = getProductListContainsOrderId(orderProductList);
+        return new OrderProductResponseDto(order, productResponseDtoList);
     }
 
 
@@ -69,10 +78,11 @@ public class OrderService {
     public OrderProductResponseDto getOrderList(Long orderId) {
         Order order = findOrder(orderId);
 
+        // orderId에 해당하는 OrderProduct 리스트를 조회
         List<OrderProduct> orderProductList = orderProductRepository.findByOrderId(orderId);
-        List<ProductResponseDto> productList = orderProductList.stream()
-                .map(orderProduct -> productClient.getProduct(orderProduct.getProductId()))
-                .toList();
+
+        // 모든 상품 정보 가져오기 (Optional 적용 == NPE 방지) - 피드백 1-1 적용
+        List<ProductResponseDto> productList = getProductListContainsOrderId(orderProductList);
 
         return new OrderProductResponseDto(order, productList);
     }
@@ -82,5 +92,18 @@ public class OrderService {
 
         return orderRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("찾으시는 주문이 존재하지 않습니다."));
+    }
+
+    private List<ProductResponseDto> getProductListContainsOrderId(List<OrderProduct> orderProductList) {
+        // 모든 상품 정보 가져오기 (Optional 적용 == NPE 방지) - 피드백 적용 1-1
+        List<ProductResponseDto> productAll = Optional.ofNullable(productService.getProductList())
+                .map(ResponseEntity::getBody)
+                .orElse(Collections.emptyList());
+
+        // orderProductList에 있는 productId에 해당하는 상품 정보만 필터링
+        return productAll.stream()
+                .filter(product -> orderProductList.stream()
+                        .anyMatch(orderProduct -> orderProduct.getProductId().equals(product.getId())))
+                .collect(Collectors.toList());
     }
 }

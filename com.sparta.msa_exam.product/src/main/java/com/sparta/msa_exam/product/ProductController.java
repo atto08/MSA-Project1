@@ -36,14 +36,6 @@ public class ProductController {
         return new ResponseEntity<>(productResponseDtoList, headers, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ProductResponseDto> getProductIdList(@PathVariable Long id) {
-
-        ProductResponseDto productResponseDto = productService.getProductIdList(id);
-        HttpHeaders headers = addPortNumber();
-        return new ResponseEntity<>(productResponseDto, headers, HttpStatus.OK);
-    }
-
     private HttpHeaders addPortNumber() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("port", port);

@@ -36,12 +36,4 @@ public class ProductService {
 
         return productResponseDtoList;
     }
-
-    public ProductResponseDto getProductIdList(Long productId) {
-
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-
-        return new ProductResponseDto(product);
-    }
 }
