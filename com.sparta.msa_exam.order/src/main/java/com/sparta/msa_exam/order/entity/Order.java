@@ -22,7 +22,7 @@ public class Order {
     private String name;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderProduct> orderItemIds;
+    private List<OrderProduct> productList;
 
     public Order(String name) {
         this.name = name;

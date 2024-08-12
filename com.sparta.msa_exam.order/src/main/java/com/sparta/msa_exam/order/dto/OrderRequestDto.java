@@ -12,6 +12,5 @@ import java.util.List;
 public class OrderRequestDto {
 
     private String name;
-
     private List<Long> productIdList;
 }
