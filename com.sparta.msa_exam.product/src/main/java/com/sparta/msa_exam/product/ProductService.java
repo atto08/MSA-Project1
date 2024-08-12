@@ -1,6 +1,8 @@
 package com.sparta.msa_exam.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,8 @@ public class ProductService {
     private final ProductRepository productRepository;
 
 
+    @Transactional
+    @CacheEvict(cacheNames = "productList-cache", allEntries = true)
     public Product createProduct(ProductRequestDto requestDto) {
 
         Product product = new Product(requestDto);
@@ -21,7 +25,7 @@ public class ProductService {
         return product;
     }
 
-    @Transactional
+    @Cacheable(cacheNames = "productList-cache")
     public List<ProductResponseDto> getProductList() {
 
         List<Product> productList = productRepository.findAll();
