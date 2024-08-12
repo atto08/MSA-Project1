@@ -1,6 +1,6 @@
 package com.sparta.msa_exam.order.service;
 
-import com.sparta.msa_exam.order.products.ProductResponseDto;
+import com.sparta.msa_exam.order.dto.ProductResponseDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

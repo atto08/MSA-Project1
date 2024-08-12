@@ -1,5 +1,6 @@
-package com.sparta.msa_exam.auth;
+package com.sparta.msa_exam.auth.controller;
 
+import com.sparta.msa_exam.auth.service.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

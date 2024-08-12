@@ -1,12 +1,11 @@
 package com.sparta.msa_exam.order.service;
 
 import com.sparta.msa_exam.order.dto.OrderProductResponseDto;
-import com.sparta.msa_exam.order.products.ProductClient;
 import com.sparta.msa_exam.order.dto.OrderRequestDto;
 import com.sparta.msa_exam.order.dto.OrderResponseDto;
 import com.sparta.msa_exam.order.entity.Order;
 import com.sparta.msa_exam.order.entity.OrderProduct;
-import com.sparta.msa_exam.order.products.ProductResponseDto;
+import com.sparta.msa_exam.order.dto.ProductResponseDto;
 import com.sparta.msa_exam.order.repository.OrderProductRepository;
 import com.sparta.msa_exam.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;

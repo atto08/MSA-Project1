@@ -1,5 +1,9 @@
-package com.sparta.msa_exam.product;
+package com.sparta.msa_exam.product.service;
 
+import com.sparta.msa_exam.product.entity.Product;
+import com.sparta.msa_exam.product.repository.ProductRepository;
+import com.sparta.msa_exam.product.dto.ProductRequestDto;
+import com.sparta.msa_exam.product.dto.ProductResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

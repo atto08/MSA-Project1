@@ -1,7 +1,6 @@
 package com.sparta.msa_exam.order.dto;
 
 import com.sparta.msa_exam.order.entity.Order;
-import com.sparta.msa_exam.order.products.ProductResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

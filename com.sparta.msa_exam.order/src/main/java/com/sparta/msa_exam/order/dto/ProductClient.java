@@ -1,4 +1,4 @@
-package com.sparta.msa_exam.order.products;
+package com.sparta.msa_exam.order.dto;
 
 import com.sparta.msa_exam.order.service.ProductService;
 import org.springframework.cloud.openfeign.FeignClient;

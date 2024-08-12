@@ -1,4 +1,4 @@
-package com.sparta.msa_exam.auth;
+package com.sparta.msa_exam.auth.config;
 
 
 import org.springframework.context.annotation.Bean;
